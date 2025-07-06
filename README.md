@@ -22,3 +22,4 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 - [ ] Keyboard controls in the browser (start/stop, clear, randomize)
 - [ ] Enhance node implementation. At least redraw the board instead of just drawing the next generation.
 - [ ] Some styling (dark mode would be nice)
+- [ ] Testing ???
