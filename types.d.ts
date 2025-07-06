@@ -31,7 +31,7 @@ type GameOfLife = {
     setRunning: (running: boolean) => void;
     isRunning: () => boolean;
     setAnimationId: (id: number) => void;
-    getAnimationId: () => number;
+    getAnimationId: () => number | null;
     getRows: () => number;
     getCols: () => number;
 };

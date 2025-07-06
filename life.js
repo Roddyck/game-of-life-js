@@ -6,23 +6,8 @@
  * @returns {GameOfLife} Game of life instance
  */
 export function createGameOfLife(config) {
-  /** @type {Config} */
-  const defaultConfig = {
-    width: 500,
-    height: 500,
-    cellSize: 10,
-    liveColor: "#000000",
-    deadColor: "#ffffff",
-    gridColor: "#dddddd",
-    initialDensity: 0.3,
-    frameDelay: 100,
-    patterns: {},
-  };
-
-  const mergedConfig = { ...defaultConfig, ...config };
-
-  const rows = Math.floor(mergedConfig.height / mergedConfig.cellSize);
-  const cols = Math.floor(mergedConfig.width / mergedConfig.cellSize);
+  const rows = Math.floor(config.height / config.cellSize);
+  const cols = Math.floor(config.width / config.cellSize);
 
   /** @type {number[][]} */
   let grid = createEmptyGrid();
@@ -42,7 +27,7 @@ export function createGameOfLife(config) {
   /** Randomizes the grid with the given density.
    * @param {number} [density] Probability of a cell being alive (0;1).
    */
-  function randomizeGrid(density = mergedConfig.initialDensity) {
+  function randomizeGrid(density = config.initialDensity) {
     grid = grid.map((row) => row.map(() => (Math.random() < density ? 1 : 0)));
     generation = 0;
     population = countLiveCells();
@@ -63,9 +48,9 @@ export function createGameOfLife(config) {
    * @returns {boolean} Whether the pattern was added successfully.
    */
   function addPattern(pattern, x = 0, y = 0) {
-    if (!mergedConfig.patterns[pattern]) return false;
+    if (!config.patterns[pattern]) return false;
 
-    const patternCells = mergedConfig.patterns[pattern].cells;
+    const patternCells = config.patterns[pattern].cells;
     patternCells.forEach(([px, py]) => {
       const nx = x + px;
       const ny = y + py;
@@ -138,7 +123,7 @@ export function createGameOfLife(config) {
   }
 
   return {
-    getConfig: () => ({ ...mergedConfig }),
+    getConfig: () => ({ ...config }),
     getGrid: () => grid,
     getGeneration: () => generation,
     getPopulation: () => population,

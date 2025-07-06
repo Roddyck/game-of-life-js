@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /** @type {CanvasRenderingContext2D | null} */
   const ctx = canvas.getContext("2d");
 
-  document.body.appendChild(canvas);
+  document.body.prepend(canvas);
 
   const startBtn = document.getElementById("startBtn");
   const stopBtn = document.getElementById("stopBtn");
@@ -81,8 +81,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function drawGrid() {
     config = game.getConfig();
+
     if (!ctx) {
-      throw new Error("Canvas context is null");
+      console.error("Canvas context is null");
+      return;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -105,11 +107,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    if (!generation) {
-      throw new Error("Generation element is null");
-    }
-    if (!population) {
-      throw new Error("Population element is null");
+    if (!generation || !population) {
+      console.error("Generation or population element is null, do something");
+      return;
     }
 
     generation.textContent = `Generation: ${game.getGeneration()}`;
@@ -143,40 +143,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  if (!startBtn) {
-    throw new Error("Start button is null");
-  }
-  if (!stopBtn) {
-    throw new Error("Stop button is null");
-  }
-  if (!clearBtn) {
-    throw new Error("Clear button is null");
-  }
-  if (!randomBtn) {
-    throw new Error("Random button is null");
-  }
-  if (!patternSelect) {
-    throw new Error("Pattern select is null");
-  }
-  if (!addPatternBtn) {
-    throw new Error("Add pattern button is null");
-  }
 
-  startBtn.addEventListener("click", () => {
+  startBtn?.addEventListener("click", () => {
     if (!game.isRunning()) {
       game.setRunning(true);
       animate();
     }
   });
 
-  stopBtn.addEventListener("click", () => {
+  stopBtn?.addEventListener("click", () => {
     if (game.isRunning()) {
       cancelAnimationFrame(game.getAnimationId());
       game.setRunning(false);
     }
   });
 
-  clearBtn.addEventListener("click", () => {
+  clearBtn?.addEventListener("click", () => {
     if (game.isRunning()) {
       cancelAnimationFrame(game.getAnimationId());
       game.setRunning(false);
@@ -185,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     drawGrid();
   });
 
-  randomBtn.addEventListener("click", () => {
+  randomBtn?.addEventListener("click", () => {
     if (game.isRunning()) {
       cancelAnimationFrame(game.getAnimationId());
       game.setRunning(false);
