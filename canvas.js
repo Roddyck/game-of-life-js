@@ -1,4 +1,28 @@
 import { createGameOfLife } from "./life.js";
+/** @import { Patterns } from "./life.js"; */
+
+/**
+ * @param {HTMLSelectElement} select
+ * @param {HTMLButtonElement} selectBtn
+ * @param {Patterns} patterns
+ */
+function createSelect(select, selectBtn, patterns) {
+  select.id = "patternSelect";
+  selectBtn.textContent = "Add Pattern";
+  selectBtn.id = "addPatternBtn";
+
+  const option = document.createElement("option");
+  option.value = "none";
+  option.textContent = "none";
+  select.appendChild(option);
+
+  Object.keys(patterns).forEach((pattern) => {
+    const option = document.createElement("option");
+    option.value = pattern;
+    option.textContent = pattern;
+    select.appendChild(option);
+  });
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   let config = {};
@@ -15,6 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
+
   const startBtn = document.getElementById("startBtn");
   const stopBtn = document.getElementById("stopBtn");
   const clearBtn = document.getElementById("clearBtn");
@@ -22,21 +47,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const patternSelect = document.createElement("select");
   const addPatternBtn = document.createElement("button");
 
+  let patternAddX = 5;
+  let patternAddY = 5;
+
   canvas.width = config.width || 500;
   canvas.height = config.height || 500;
 
   const game = createGameOfLife(config);
 
-  patternSelect.id = "patternSelect";
-  addPatternBtn.textContent = "Add Pattern";
-  addPatternBtn.id = "addPatternBtn";
-
-  Object.keys(game.getConfig().patterns).forEach((pattern) => {
-    const option = document.createElement("option");
-    option.value = pattern;
-    option.textContent = pattern;
-    patternSelect.appendChild(option);
-  });
+  createSelect(patternSelect, addPatternBtn, game.getConfig().patterns);
 
   document.querySelector("div").appendChild(patternSelect);
   document.querySelector("div").appendChild(addPatternBtn);
@@ -46,10 +65,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cellSize = config.cellSize;
+    const grid = game.getGrid();
 
     for (let i = 0; i < game.getRows(); i++) {
       for (let j = 0; j < game.getCols(); j++) {
-        if (game.getGrid()[i][j] === 1) {
+        if (grid[i][j] === 1) {
           ctx.fillStyle = config.liveColor;
           ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
         } else {
@@ -85,8 +105,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const col = Math.floor(x / cellSize);
     const row = Math.floor(y / cellSize);
 
-    grid[row][col] = grid[row][col] ? 0 : 1;
-    drawGrid();
+    if (patternSelect.value === "none") {
+      grid[row][col] = grid[row][col] ? 0 : 1;
+      drawGrid();
+    } else {
+      patternAddX = col;
+      patternAddY = row;
+    }
   });
 
   startBtn.addEventListener("click", () => {
@@ -124,8 +149,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   addPatternBtn.addEventListener("click", () => {
     if (game.isRunning()) return;
 
+    // Can I enforce user to select position from here?
     const pattern = patternSelect.value;
-    const added = game.addPattern(pattern, 5, 5);
+    const added = game.addPattern(pattern, patternAddX, patternAddY);
     if (added) {
       drawGrid();
     }

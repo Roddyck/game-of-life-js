@@ -1,20 +1,48 @@
 /**
+ * @typedef {Object} Pattern
+ * @property {number[][]} cells The cells of the pattern.
+ * @property {string} description The description of the pattern.
+ */
+
+/**
+ * @typedef {Object} Patterns
+ * @property {Pattern} pattern The pattern object.
+ */
+
+/**
+ * @typedef {Object} Config
+ * @property {number} width The width of the canvas.
+ * @property {number} height The height of the canvas.
+ * @property {number} cellSize The size of each cell.
+ * @property {string} liveColor The color of live cells.
+ * @property {string} deadColor The color of dead cells.
+ * @property {string} gridColor The color of the grid.
+ * @property {number} initialDensity The initial density of the grid.
+ * @property {number} frameDelay The delay between frames.
+ * @property {Patterns} patterns The patterns to add to the grid.
+ */
+
+/**
+ * @typedef {Object} GameOfLife
+ * @property {function} getConfig Returns the configuration object.
+ * @property {function} getGrid Returns the current grid.
+ * @property {function} getGeneration Returns the current generation.
+ * @property {function} randomizeGrid Randomizes the grid with the given density.
+ * @property {function} clearGrid Clears the grid.
+ * @property {function} addPattern Adds a pattern to the grid.
+ * @property {function} nextGeneration Returns the next generation of the grid.
+ * @property {function} setRunning Sets whether the game is running.
+ * @property {function} isRunning Returns whether the game is running.
+ * @property {function} setAnimationId Sets the animation ID.
+ * @property {function} getAnimationId Returns the animation ID.
+ * @property {function} getRows Returns the number of rows in the grid.
+ * @property {function} getCols Returns the number of columns in the grid.
+ */
+
+/**
  * Creates a game of life object.
- * @param {object} config The configuration object.
- * @returns {object} An object with the following properties:
- * - getConfig(): Returns the configuration object.
- * - getGrid(): Returns the current grid.
- * - getGeneration(): Returns the current generation.
- * - randomizeGrid(density): Randomizes the grid with the given density.
- * - clearGrid(): Clears the grid.
- * - addPattern(pattern, x, y): Adds a pattern to the grid.
- * - nextGeneration(): Returns the next generation of the grid.
- * - setRunning(running): Sets whether the game is running.
- * - isRunning(): Returns whether the game is running.
- * - setAnimationId(id): Sets the animation ID.
- * - getAnimationId(): Returns the animation ID.
- * - getRows(): Returns the number of rows in the grid.
- * - getCols(): Returns the number of columns in the grid.
+ * @param {Config} config The configuration object.
+ * @returns {GameOfLife}
  */
 export function createGameOfLife(config) {
   const defaultConfig = {
@@ -58,7 +86,7 @@ export function createGameOfLife(config) {
   /**
    * Adds a pattern to the grid.
    *
-   * @param {object} pattern The pattern object.
+   * @param {Pattern} pattern The pattern object.
    * @param {number} x The x-coordinate of the pattern's center.
    * @param {number} y The y-coordinate of the pattern's center.
    * @returns {boolean} Whether the pattern was added successfully.
