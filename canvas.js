@@ -1,5 +1,7 @@
+// @ts-check
+// <reference path="./types.d.ts" />
+
 import { createGameOfLife } from "./life.js";
-/** @import { Patterns } from "./life.js"; */
 
 /**
  * @param {HTMLSelectElement} select
@@ -25,7 +27,18 @@ function createSelect(select, selectBtn, patterns) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  let config = {};
+  /** @type {Config} */
+  let config = {
+    width: 500,
+    height: 500,
+    cellSize: 10,
+    liveColor: "#000000",
+    deadColor: "#ffffff",
+    gridColor: "#dddddd",
+    initialDensity: 0.3,
+    frameDelay: 100,
+    patterns: {},
+  };
 
   try {
     const response = await fetch("config.json");
@@ -37,8 +50,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log(config);
 
-  const canvas = document.getElementById("gameCanvas");
+  /** @type {HTMLCanvasElement} */
+  let canvas = document.createElement("canvas");
+  /** @type {CanvasRenderingContext2D | null} */
   const ctx = canvas.getContext("2d");
+
+  document.body.appendChild(canvas);
 
   const startBtn = document.getElementById("startBtn");
   const stopBtn = document.getElementById("stopBtn");
@@ -46,6 +63,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const randomBtn = document.getElementById("randomBtn");
   const patternSelect = document.createElement("select");
   const addPatternBtn = document.createElement("button");
+  const generation = document.getElementById("generation");
+  const population = document.getElementById("population");
 
   let patternAddX = 5;
   let patternAddY = 5;
@@ -57,11 +76,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   createSelect(patternSelect, addPatternBtn, game.getConfig().patterns);
 
-  document.querySelector("div").appendChild(patternSelect);
-  document.querySelector("div").appendChild(addPatternBtn);
+  document.querySelector("div")?.appendChild(patternSelect);
+  document.querySelector("div")?.appendChild(addPatternBtn);
 
   function drawGrid() {
     config = game.getConfig();
+    if (!ctx) {
+      throw new Error("Canvas context is null");
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cellSize = config.cellSize;
@@ -82,9 +105,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    ctx.fillStyle = "black";
-    ctx.font = "16px Arial";
-    ctx.fillText(`Generation: ${game.getGeneration()}`, 10, 20);
+    if (!generation) {
+      throw new Error("Generation element is null");
+    }
+    if (!population) {
+      throw new Error("Population element is null");
+    }
+
+    generation.textContent = `Generation: ${game.getGeneration()}`;
+    population.textContent = `Population: ${game.getPopulation()}`;
   }
 
   function animate() {
@@ -113,6 +142,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       patternAddY = row;
     }
   });
+
+  if (!startBtn) {
+    throw new Error("Start button is null");
+  }
+  if (!stopBtn) {
+    throw new Error("Stop button is null");
+  }
+  if (!clearBtn) {
+    throw new Error("Clear button is null");
+  }
+  if (!randomBtn) {
+    throw new Error("Random button is null");
+  }
+  if (!patternSelect) {
+    throw new Error("Pattern select is null");
+  }
+  if (!addPatternBtn) {
+    throw new Error("Add pattern button is null");
+  }
 
   startBtn.addEventListener("click", () => {
     if (!game.isRunning()) {

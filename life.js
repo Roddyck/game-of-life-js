@@ -1,50 +1,12 @@
-/**
- * @typedef {Object} Pattern
- * @property {number[][]} cells The cells of the pattern.
- * @property {string} description The description of the pattern.
- */
+// @ts-check
+// <reference path="./types.d.ts" />
 
-/**
- * @typedef {Object} Patterns
- * @property {Pattern} pattern The pattern object.
- */
-
-/**
- * @typedef {Object} Config
- * @property {number} width The width of the canvas.
- * @property {number} height The height of the canvas.
- * @property {number} cellSize The size of each cell.
- * @property {string} liveColor The color of live cells.
- * @property {string} deadColor The color of dead cells.
- * @property {string} gridColor The color of the grid.
- * @property {number} initialDensity The initial density of the grid.
- * @property {number} frameDelay The delay between frames.
- * @property {Patterns} patterns The patterns to add to the grid.
- */
-
-/**
- * @typedef {Object} GameOfLife
- * @property {function} getConfig Returns the configuration object.
- * @property {function} getGrid Returns the current grid.
- * @property {function} getGeneration Returns the current generation.
- * @property {function} randomizeGrid Randomizes the grid with the given density.
- * @property {function} clearGrid Clears the grid.
- * @property {function} addPattern Adds a pattern to the grid.
- * @property {function} nextGeneration Returns the next generation of the grid.
- * @property {function} setRunning Sets whether the game is running.
- * @property {function} isRunning Returns whether the game is running.
- * @property {function} setAnimationId Sets the animation ID.
- * @property {function} getAnimationId Returns the animation ID.
- * @property {function} getRows Returns the number of rows in the grid.
- * @property {function} getCols Returns the number of columns in the grid.
- */
-
-/**
- * Creates a game of life object.
+/** Creates a game of life object.
  * @param {Config} config The configuration object.
- * @returns {GameOfLife}
+ * @returns {GameOfLife} Game of life instance
  */
 export function createGameOfLife(config) {
+  /** @type {Config} */
   const defaultConfig = {
     width: 500,
     height: 500,
@@ -62,31 +24,40 @@ export function createGameOfLife(config) {
   const rows = Math.floor(mergedConfig.height / mergedConfig.cellSize);
   const cols = Math.floor(mergedConfig.width / mergedConfig.cellSize);
 
+  /** @type {number[][]} */
   let grid = createEmptyGrid();
   let isRunning = false;
+  /** @type {number | null} */
   let animationId = null;
   let generation = 0;
+  let population = 0;
 
+  /** @returns {number[][]} */
   function createEmptyGrid() {
     return Array.from({ length: rows }, () =>
       Array.from({ length: cols }, () => 0),
     );
   }
 
+  /** Randomizes the grid with the given density.
+   * @param {number} [density] Probability of a cell being alive (0;1).
+   */
   function randomizeGrid(density = mergedConfig.initialDensity) {
     grid = grid.map((row) => row.map(() => (Math.random() < density ? 1 : 0)));
     generation = 0;
+    population = countLiveCells();
   }
 
   function clearGrid() {
     grid = createEmptyGrid();
     generation = 0;
+    population = 0;
   }
 
   /**
    * Adds a pattern to the grid.
    *
-   * @param {Pattern} pattern The pattern object.
+   * @param {string} pattern Pattern name from config
    * @param {number} x The x-coordinate of the pattern's center.
    * @param {number} y The y-coordinate of the pattern's center.
    * @returns {boolean} Whether the pattern was added successfully.
@@ -133,6 +104,8 @@ export function createGameOfLife(config) {
     return count;
   }
 
+  
+   /** @returns {number[][]} */
   function nextGeneration() {
     const newGrid = createEmptyGrid();
 
@@ -153,13 +126,22 @@ export function createGameOfLife(config) {
 
     grid = newGrid;
     generation++;
+    population = countLiveCells();
     return grid;
+  }
+
+  function countLiveCells() {
+    return grid.reduce(
+      (acc, row) => acc + row.reduce((acc, cell) => acc + cell, 0),
+      0,
+    );
   }
 
   return {
     getConfig: () => ({ ...mergedConfig }),
     getGrid: () => grid,
     getGeneration: () => generation,
+    getPopulation: () => population,
     randomizeGrid,
     clearGrid,
     addPattern,
