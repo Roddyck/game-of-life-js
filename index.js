@@ -1,12 +1,25 @@
 import { cursorTo, clearScreenDown } from "readline";
 import { stdout } from "process";
 import { createGameOfLife } from "./life.js";
+import { readFileSync } from "fs";
 
-const width = process.stdout.columns || 80;
-const height = (process.stdout.rows || 24) - 2;
+let config = {};
+try {
+  const configFile = readFileSync("./config.json", "utf8");
+  config = JSON.parse(configFile);
+} catch (e) {
+  console.warn("No config file found. Using default config.");
+}
 
-const game = createGameOfLife(width, height, 1);
-game.randomizeGrid();
+const width = process.stdout.columns || config.width || 80;
+const height = (process.stdout.rows || config.height ||  24) - 2;
+
+const game = createGameOfLife({ ...config, width, height, cellSize: 1 });
+game.randomizeGrid(config.initialDensity);
+
+if (process.argv[2] && game.getConfig().patterns[process.argv[2]]) {
+  game.addPattern(process.argv[2], 5, 5);
+}
 
 function renderTerminal() {
   cursorTo(stdout, 0, 0);
