@@ -1,31 +1,43 @@
 /**
  * Creates a game of life object.
- * @param {number} width The width of the grid.
- * @param {number} height The height of the grid.
- * @param {number} cellSize The size of each cell.
+ * @param {object} config The configuration object.
  * @returns {object} An object with the following properties:
- *   - getGrid(): Returns the current grid.
- *   - getGeneration(): Returns the current generation.
- *   - randomizeGrid(): Randomizes the grid.
- *   - clearGrid(): Clears the grid.
- *   - nextGeneration(): Returns the next generation of the grid.
- *   - setRunning(running): Sets whether the game is running.
- *   - isRunning(): Returns whether the game is running.
- *   - setAnimationId(id): Sets the animation ID.
- *   - getAnimationId(): Returns the animation ID.
- *   - getRows(): Returns the number of rows in the grid.
- *   - getCols(): Returns the number of columns in the grid.
- *   - getCellSize(): Returns the size of each cell.
+ * - getConfig(): Returns the configuration object.
+ * - getGrid(): Returns the current grid.
+ * - getGeneration(): Returns the current generation.
+ * - randomizeGrid(density): Randomizes the grid with the given density.
+ * - clearGrid(): Clears the grid.
+ * - addPattern(pattern, x, y): Adds a pattern to the grid.
+ * - nextGeneration(): Returns the next generation of the grid.
+ * - setRunning(running): Sets whether the game is running.
+ * - isRunning(): Returns whether the game is running.
+ * - setAnimationId(id): Sets the animation ID.
+ * - getAnimationId(): Returns the animation ID.
+ * - getRows(): Returns the number of rows in the grid.
+ * - getCols(): Returns the number of columns in the grid.
  */
-export function createGameOfLife(width, height, cellSize) {
-  const rows = Math.floor(height / cellSize);
-  const cols = Math.floor(width / cellSize);
-  const threshold = 0.7;
+export function createGameOfLife(config) {
+  const defaultConfig = {
+    width: 500,
+    height: 500,
+    cellSize: 10,
+    liveColor: "#000000",
+    deadColor: "#ffffff",
+    gridColor: "#dddddd",
+    initialDensity: 0.3,
+    frameDelay: 100,
+    patterns: {},
+  };
+
+  const mergedConfig = { ...defaultConfig, ...config };
+
+  const rows = Math.floor(mergedConfig.height / mergedConfig.cellSize);
+  const cols = Math.floor(mergedConfig.width / mergedConfig.cellSize);
 
   let grid = createEmptyGrid();
-  let generation = 0;
   let isRunning = false;
   let animationId = null;
+  let generation = 0;
 
   function createEmptyGrid() {
     return Array.from({ length: rows }, () =>
@@ -33,16 +45,37 @@ export function createGameOfLife(width, height, cellSize) {
     );
   }
 
-  function randomizeGrid() {
-    grid = grid.map((row) =>
-      row.map(() => (Math.random() > threshold ? 1 : 0)),
-    );
+  function randomizeGrid(density = mergedConfig.initialDensity) {
+    grid = grid.map((row) => row.map(() => (Math.random() < density ? 1 : 0)));
     generation = 0;
   }
 
   function clearGrid() {
     grid = createEmptyGrid();
     generation = 0;
+  }
+
+  /**
+   * Adds a pattern to the grid.
+   *
+   * @param {object} pattern The pattern object.
+   * @param {number} x The x-coordinate of the pattern's center.
+   * @param {number} y The y-coordinate of the pattern's center.
+   * @returns {boolean} Whether the pattern was added successfully.
+   */
+  function addPattern(pattern, x = 0, y = 0) {
+    if (!mergedConfig.patterns[pattern]) return false;
+
+    const patternCells = mergedConfig.patterns[pattern].cells;
+    patternCells.forEach(([px, py]) => {
+      const nx = x + px;
+      const ny = y + py;
+      if (nx >= 0 && nx < rows && ny >= 0 && ny < cols) {
+        grid[ny][nx] = 1;
+      }
+    });
+
+    return true;
   }
 
   /**
@@ -96,10 +129,12 @@ export function createGameOfLife(width, height, cellSize) {
   }
 
   return {
+    getConfig: () => ({ ...mergedConfig }),
     getGrid: () => grid,
     getGeneration: () => generation,
     randomizeGrid,
     clearGrid,
+    addPattern,
     nextGeneration,
     setRunning: (running) => {
       isRunning = running;
@@ -111,7 +146,5 @@ export function createGameOfLife(width, height, cellSize) {
     getAnimationId: () => animationId,
     getRows: () => rows,
     getCols: () => cols,
-    getCellSize: () => cellSize,
   };
 }
-
