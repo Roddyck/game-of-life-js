@@ -20,6 +20,6 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 - [x] Presets (e.g. glider, spaceship)
 - [x] Add configuration (json or/and inputs from the page)
 - [x] Keyboard controls in the browser (start/stop, clear, randomize)
+- [x] Some styling (dark mode would be nice)
 - [ ] Enhance node implementation. At least redraw the board instead of just drawing the next generation.
-- [ ] Some styling (dark mode would be nice)
 - [ ] Testing ???

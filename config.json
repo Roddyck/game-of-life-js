@@ -1,10 +1,10 @@
 {
   "width": 800,
   "height": 800,
-  "cellSize": 10,
-  "liveColor": "#000000",
-  "deadColor": "#ffffff",
-  "gridColor": "#dddddd",
+  "cellSize": 20,
+   "liveColor": "#fabd2fc9",
+   "deadColor": "#282828",
+   "gridColor": "#ebdbb2",
   "initialDensity": 0.3,
   "frameDelay": 100,
   "patterns": {

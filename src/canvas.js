@@ -11,8 +11,9 @@ function createSelect(select, patterns) {
   select.id = "patternSelect";
 
   const option = document.createElement("option");
-  option.value = "none";
-  option.textContent = "none";
+  option.value = "Select Pattern";
+  option.textContent = "Select Pattern";
+  option.selected = true;
   select.appendChild(option);
 
   Object.keys(patterns).forEach((pattern) => {
@@ -29,9 +30,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     width: 500,
     height: 500,
     cellSize: 10,
-    liveColor: "#000000",
-    deadColor: "#ffffff",
-    gridColor: "#dddddd",
+    liveColor: "#d79921",
+    deadColor: "#282828",
+    gridColor: "#ebdbb2",
     initialDensity: 0.3,
     frameDelay: 100,
     patterns: {},
@@ -52,23 +53,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   /** @type {CanvasRenderingContext2D | null} */
   const ctx = canvas.getContext("2d");
 
-  document.body.prepend(canvas);
+  
+
+  document.querySelector("div")?.prepend(canvas);
 
   const playPauseBtn = document.getElementById("play-pause-btn");
   const clearBtn = document.getElementById("clearBtn");
   const randomBtn = document.getElementById("randomBtn");
-  const patternSelect = document.createElement("select");
   const generation = document.getElementById("generation");
   const population = document.getElementById("population");
+
+  /** @type {HTMLSelectElement | null} */
+  const patternSelect = document.getElementById("patternSelect");
 
   canvas.width = config.width || 500;
   canvas.height = config.height || 500;
 
   const game = createGameOfLife(config);
 
-  createSelect(patternSelect, game.getConfig().patterns);
+  if (patternSelect) {
+    createSelect(patternSelect, game.getConfig().patterns);
+  }
 
-  document.querySelector("div")?.appendChild(patternSelect);
+
+  if (patternSelect) {
+    document.querySelector("div")?.appendChild(patternSelect);
+  }
 
   function drawGrid() {
     config = game.getConfig();
@@ -125,9 +135,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const col = Math.floor(x / cellSize);
     const row = Math.floor(y / cellSize);
 
+    if (!patternSelect) {
+      return;
+    }
+
     const patternValue = patternSelect.value;
 
-    if (patternValue === "none") {
+    if (patternValue === "Select Pattern") {
       grid[row][col] = grid[row][col] ? 0 : 1;
       drawGrid();
     } else {

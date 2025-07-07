@@ -1,24 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Game of Life</title>
-        <style>
-            body { font-family: Arial, sans-serif; text-align: center; }
-            canvas { background: #eee; display: block; margin: 0 auto; }
-            button { margin: 10px; padding: 8px 15px; }
-            h3 { text-align: center; color: white; }
-        </style>
+        <link rel="stylesheet" href="src/output.css">
         <script type="module" src="src/canvas.js"></script>
     </head>
-    <body>
-        <h3 id="generation" >Generation: 0</h1>
-        <h3 id="population" >Population: 0</h1>
-        <div>
-            <button id="play-pause-btn">Play</button>
-            <button id="clearBtn">Clear</button>
-            <button id="randomBtn">Random</button>
-        </div>
+    <body class="bg-gray-900 text-white">
+        <div class="flex flex-col items-center justify-center">
+          <h3 id="generation" class="text-2xl">Generation: 0</h3>
+          <h3 id="population" class="text-2xl">Population: 0</h3>
+          <div id="buttons" class="flex flex-row justify-center my-4">
+              <button 
+                id="play-pause-btn"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-1 rounded"
+              >
+                Play
+              </button>
+              <button 
+                id="clearBtn"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mx-1 rounded"
+              >
+                Clear
+              </button>
+              <button 
+                id="randomBtn"
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mx-1 rounded"
+              >
+                Randomize
+              </button>
+          </div>
+          <label for="patternSelect" class="block mb-2 text-sm font-medium text-gray-900 text-white">Select Pattern</label>
+          <select id="patternSelect" class="block w-auto p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"></select>
+      </div>
     </body>
 </html>
