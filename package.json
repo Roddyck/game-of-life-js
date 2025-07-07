@@ -15,6 +15,8 @@
     "prettier": "^3.6.2"
   },
   "dependencies": {
-    "live-server": "^1.2.2"
+    "@tailwindcss/cli": "^4.1.11",
+    "live-server": "^1.2.2",
+    "tailwindcss": "^4.1.11"
   }
 }

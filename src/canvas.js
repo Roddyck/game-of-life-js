@@ -5,13 +5,10 @@ import { createGameOfLife } from "./life.js";
 
 /**
  * @param {HTMLSelectElement} select
- * @param {HTMLButtonElement} selectBtn
  * @param {Patterns} patterns
  */
-function createSelect(select, selectBtn, patterns) {
+function createSelect(select, patterns) {
   select.id = "patternSelect";
-  selectBtn.textContent = "Add Pattern";
-  selectBtn.id = "addPatternBtn";
 
   const option = document.createElement("option");
   option.value = "none";
@@ -57,27 +54,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.body.prepend(canvas);
 
-  const startBtn = document.getElementById("startBtn");
-  const stopBtn = document.getElementById("stopBtn");
+  const playPauseBtn = document.getElementById("play-pause-btn");
   const clearBtn = document.getElementById("clearBtn");
   const randomBtn = document.getElementById("randomBtn");
   const patternSelect = document.createElement("select");
-  const addPatternBtn = document.createElement("button");
   const generation = document.getElementById("generation");
   const population = document.getElementById("population");
-
-  let patternAddX = 5;
-  let patternAddY = 5;
 
   canvas.width = config.width || 500;
   canvas.height = config.height || 500;
 
   const game = createGameOfLife(config);
 
-  createSelect(patternSelect, addPatternBtn, game.getConfig().patterns);
+  createSelect(patternSelect, game.getConfig().patterns);
 
   document.querySelector("div")?.appendChild(patternSelect);
-  document.querySelector("div")?.appendChild(addPatternBtn);
 
   function drawGrid() {
     config = game.getConfig();
@@ -134,59 +125,86 @@ document.addEventListener("DOMContentLoaded", async () => {
     const col = Math.floor(x / cellSize);
     const row = Math.floor(y / cellSize);
 
-    if (patternSelect.value === "none") {
+    const patternValue = patternSelect.value;
+
+    if (patternValue === "none") {
       grid[row][col] = grid[row][col] ? 0 : 1;
       drawGrid();
     } else {
-      patternAddX = col;
-      patternAddY = row;
+      const added = game.addPattern(patternValue, col, row);
+      if (added) {
+        drawGrid();
+      }
     }
   });
 
-
-  startBtn?.addEventListener("click", () => {
+  const handlePlayPauseBtnClick = () => {
+    if (!playPauseBtn) {
+      return;
+    }
     if (!game.isRunning()) {
       game.setRunning(true);
+      playPauseBtn.textContent = "Pause";
       animate();
+    } else {
+      const animationId = game.getAnimationId();
+      if (animationId != null) {
+        cancelAnimationFrame(animationId);
+        playPauseBtn.textContent = "Play";
+        game.setRunning(false);
+      }
     }
-  });
+  };
 
-  stopBtn?.addEventListener("click", () => {
+  const handleClearBtnClick = () => {
     if (game.isRunning()) {
-      cancelAnimationFrame(game.getAnimationId());
-      game.setRunning(false);
-    }
-  });
-
-  clearBtn?.addEventListener("click", () => {
-    if (game.isRunning()) {
-      cancelAnimationFrame(game.getAnimationId());
-      game.setRunning(false);
+      const animationId = game.getAnimationId();
+      if (animationId != null) {
+        cancelAnimationFrame(animationId);
+        game.setRunning(false);
+      }
     }
     game.clearGrid();
     drawGrid();
-  });
+  };
 
-  randomBtn?.addEventListener("click", () => {
+  const handleRandomBtnClick = () => {
     if (game.isRunning()) {
-      cancelAnimationFrame(game.getAnimationId());
-      game.setRunning(false);
+      const animationId = game.getAnimationId();
+      if (animationId != null) {
+        cancelAnimationFrame(animationId);
+        game.setRunning(false);
+      }
     }
     game.randomizeGrid();
     drawGrid();
-  });
+  };
 
-  addPatternBtn.addEventListener("click", () => {
-    if (game.isRunning()) return;
+  playPauseBtn?.addEventListener("click", handlePlayPauseBtnClick);
 
-    // Can I enforce user to select position from here?
-    const pattern = patternSelect.value;
-    const added = game.addPattern(pattern, patternAddX, patternAddY);
-    if (added) {
-      drawGrid();
-    }
-  });
+  clearBtn?.addEventListener("click", handleClearBtnClick);
+
+  randomBtn?.addEventListener("click", handleRandomBtnClick);
 
   game.randomizeGrid();
   drawGrid();
+
+  document.addEventListener("keydown", (e) => {
+    if (e.getModifierState("Control")) {
+      return;
+    }
+
+    switch (e.key) {
+      case " ":
+      case "Enter":
+        handlePlayPauseBtnClick();
+        break;
+      case "r":
+        handleRandomBtnClick();
+        break;
+      case "c":
+        handleClearBtnClick();
+        break;
+    }
+  });
 });
